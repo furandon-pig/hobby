@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>localStorageサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="lib/bootstrap-master/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="lib/bootstrap-master/dist/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="lib/bootstrap-master/dist/js/bootstrap.min.js">
+</head>
+<body style="margin-left:60px">
+  <div class="row">
+    <h3>localStorageサンプル</h3>
+  </div>
+
+
+  <div class="row">
+    <h4>入力データ</h4>
+  </div>
+  <!-- key:valueの入力欄 -->
+  <div class="row">
+    <div class="col-xs-6 form-inline">
+      <label>key</label>
+      <input class="form-control" id="ws_key" type="text">
+    </div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <div class="col-xs-6 form-inline">
+      <label>value</label>
+      <input class="form-control" id="ws_val" type="text">
+      <input type="checkbox" id="is_overwrite">&nbsp;getItem()の値で置き換える。
+    </div>
+  </div>
+
+  <!-- 操作用のボタン類 -->
+  <div class="form-inline form-group" style="margin-top:10px;">
+    <button type="button" class="btn btn-primary" onclick="ws_sample.save()">set</button>
+    <button type="button" class="btn btn-default" onclick="ws_sample.get()">get</button>
+    <!--
+    <button type="button" class="btn btn-warning" onclick="ws_sample.remove()">remove</button>
+    -->
+    <button type="button" class="btn btn-danger"  onclick="ws_sample.all_clear()">clear all</button>
+  </div>
+
+  <!-- Web Storage内容の表示用テーブル -->
+  <div class="row">
+    <h4>Web Storageの内容</h4>
+  </div>
+  <div class="raw">
+    <div class="col-xs-6"> 
+      <span id="result"></span>
+    </div>
+  </div>
+
+<script>
+
+ws_sample = new Object();
+
+onload = function() {
+	ws_sample.ls = localStorage;
+
+	ws_sample.key = document.getElementById('ws_key');
+	ws_sample.val = document.getElementById('ws_val');
+
+	ws_sample.save = function() {
+		console.log('save' + ws_sample.key.value + ':' + ws_sample.val.value);
+
+		var key = ws_sample.key.value;
+		var val = ws_sample.val.value;
+		ws_sample.ls.setItem(key, val);
+
+		ws_sample.update();
+	};
+
+	ws_sample.remove = function(_key) {
+		console.log('remove');
+		if (_key != undefined) {
+			ws_sample.ls.removeItem(_key);
+		} else {
+			ws_sample.ls.removeItem(key);
+		}
+
+		ws_sample.update();
+	};
+
+	ws_sample.get = function() {
+		console.log('get');
+		var key = ws_sample.key.value;
+		var val = ws_sample.ls.getItem(key);
+
+		alert(key + ':' + val);
+		if (document.getElementById('is_overwrite').checked == true) {
+			ws_sample.val.value = val;
+			ws_sample.update();
+		}
+
+		console.log(key + ':' + val);
+	};
+
+	ws_sample.all_clear = function() {
+		console.log('clear');
+		ws_sample.ls.clear();
+
+		ws_sample.update();
+	};
+
+	ws_sample.update = function() {
+		var key;
+		var val;
+		var table = '';
+		
+		table += '<table class="table table-hover">';
+			table += '<tr><th>key</th><th>value</th><th></th></tr>';
+
+		for (var i = 0; i < ws_sample.ls.length; i++) {
+			key = ws_sample.ls.key(i);
+			val = ws_sample.ls.getItem(key);
+			table += '<tr><td>' + key + '</td><td>' + val + '</td>';
+			table += '<td><button type="button" class="btn btn-warning" ';
+			table += 'onclick="ws_sample.remove(\'' + key + '\');">remove</button></td></tr>';
+		}
+		table += '</table>';
+
+		document.getElementById("result").innerHTML = table;
+	};
+
+	ws_sample.update();  /* ページ読み込み時に現在のデータを表示する */
+}
+
+</script>
+
+</body>
